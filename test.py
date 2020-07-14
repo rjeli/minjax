@@ -3,14 +3,25 @@ import jax
 import jax.numpy as np
 from jax import grad, jit
 
+def f2(x):
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    x = x + .05
+    return x
+
 def tanh(x):
-    y = np.exp(-2.0*x)
-    return (1.0 - y) / (1.0 + y)
+    a = x*2.3
+    b = x*4.5 + f2(x) + f2(x)
+    return a + b + x*(a+b)
 
-gtanh = grad(tanh)
-print(gtanh(1.))
+print('python: tanh(12) == ', tanh(12))
 
-c = jax.xla_computation(tanh, backend='cpu')(1.)
+c = jax.xla_computation(tanh, backend='cpu')(np.array([1.]))
 print(c.as_hlo_text())
 
 s = c.as_serialized_hlo_module_proto()

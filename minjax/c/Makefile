@@ -1,15 +1,16 @@
 CXX=c++
-CXXFLAGS=-g -Wall -Werror -std=c++14 -shared -fPIC \
+CXXFLAGS=-g -Wall -Werror -std=c++14 -fPIC \
 	$(shell python3 -m pybind11 --includes) \
 	$(shell pkg-config --cflags protobuf) \
-	-I/usr/lib/llvm-10/include
-LDFLAGS=$(shell pkg-config --libs protobuf) \
+	$(shell llvm-config-10 --cxxflags) -fexceptions
+LDFLAGS=-shared \
+	$(shell pkg-config --libs protobuf) \
 	$(shell llvm-config-10 --ldflags --system-libs --libs core orcjit native)
 
-SRC=native.cc xla_data.pb.cc hlo.pb.cc
+SRC=main.cc xla_data.pb.cc hlo.pb.cc
 OBJ=$(SRC:.cc=.o)
 
-jaxopt_native.so: $(OBJ)
+minjax_c.so: $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cc
